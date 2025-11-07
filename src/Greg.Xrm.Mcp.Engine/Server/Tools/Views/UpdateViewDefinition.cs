@@ -88,6 +88,15 @@ attributes from the related entity must be add with an <attribute> node inside t
 				{
 					clone["fetchxml"] = newFetchXml;
 				}
+				else
+				{
+					clone["fetchxml"] = view.FetchXml;
+				}
+
+				//clone["name"] = view.Name;
+				//clone["querytype"] = view.QueryType;
+				clone["returnedtypecode"] = view.ReturnedTypeCode;
+				//clone["isquickfindquery"] = view.IsQuickFindQuery;
 				await client.UpdateAsync(clone);
 
 				await mcpServer.NotifyProgressAsync(token, "Publishing...", 70);

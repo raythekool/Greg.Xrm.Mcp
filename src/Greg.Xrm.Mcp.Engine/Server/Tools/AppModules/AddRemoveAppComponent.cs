@@ -1,4 +1,5 @@
 ﻿using Greg.Xrm.Mcp.Core.Authentication;
+using Greg.Xrm.Mcp.Core.Services;
 using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Extensions.Logging;
 using Microsoft.Xrm.Sdk;
@@ -10,7 +11,8 @@ namespace Greg.Xrm.Mcp.Server.Tools.AppModules
 	[McpServerToolType]
 	public class AddRemoveAppComponent(
 		ILogger<AddRemoveAppComponent> logger,
-		IDataverseClientProvider clientProvider
+		IDataverseClientProvider clientProvider,
+		IPublishXmlBuilder publishXmlBuilder
 	)
 	{
 		[McpServerTool(Name = "dataverse_appmodule_addremovecomponent",
@@ -75,7 +77,7 @@ When you remove an entity from the app, remember to also remove it from the site
 						AppId = appGuid,
 						Components = [
 							new EntityReference(componentName, componentGuid)
-						]
+						],
 					};
 				}
 				else
@@ -91,7 +93,13 @@ When you remove an entity from the app, remember to also remove it from the site
 
 				await client.ExecuteAsync(request);
 
-				return $"✅ Success: operation completed!";
+
+
+				publishXmlBuilder.AddAppModule(appGuid);
+				var publishRequest = publishXmlBuilder.Build();
+				await client.ExecuteAsync(publishRequest);
+
+				return $"✅ Success: operation completed and app publised!";
 			}
 			catch
 			(Exception ex)
